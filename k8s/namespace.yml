@@ -1,0 +1,4 @@
+kind: NameSpace
+apiVersion: v1
+metadata:
+  name: coding-cloud
