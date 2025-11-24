@@ -17,10 +17,10 @@ spec:
       - name: frontend
         image: pritam44/coding-cloud-frontend:latest
         imagePullPolicy: Always
-        resources:
-          requests:
-            cpu: "128Mi"
-            memory: "100m"
+       ## resources:
+       ##   requests:
+       ##     cpu: "128Mi"
+       ##     memory: "100m"
         ports:
         - containerPort: 80
         livenessProbe:
