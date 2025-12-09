@@ -9,9 +9,9 @@ pipeline {
     }
 
     parameters {
-        string(name: 'FRONTEND_IMAGE_TAG', defaultValue: 'latest', description: 'Frontend IMG to Deploy'),
-        string(name: 'BACKEND_IMAGE_TAG', defaultValue: 'latest', description: 'Backend IMG to Deploy'),
-        string(name: 'TRIGGERED_BY', defaultValue: 'manual'),
+        string(name: 'FRONTEND_IMAGE_TAG', defaultValue: 'latest', description: 'Frontend IMG to Deploy')
+        string(name: 'BACKEND_IMAGE_TAG', defaultValue: 'latest', description: 'Backend IMG to Deploy')
+        string(name: 'TRIGGERED_BY', defaultValue: 'manual')
     }
 
     stages {
@@ -70,7 +70,7 @@ pipeline {
         stage('Wait For Rollout') {
             steps {
                 sh """
-                  if [ "${params.FRONTEND_IMAGE_TAGE}" != "latest" ]; then
+                  if [ "${params.FRONTEND_IMAGE_TAG}" != "latest" ]; then
                      echo "Waiting For Frontend Rollout ..."
                      kubectl rollout status deployment frontend-deployment -n ${NAMESPACE} --timeout=5m
                   fi
@@ -90,9 +90,9 @@ pipeline {
                 sh """
                   echo "Verfying Deployment Status"
                   kubectl get pods -n ${NAMESPACE} -o wide
-                  FRONTEND_READY=\$(kubectl get deployment frontend-deployment -n ${NAMESPACE} -o jsonPath='{.status.readyReplicas}')
-                  BACKEND_READY=\$(kubectl get deployment backend-deployment -n ${NAMESPACE} -o jsonPath='{.status.readyReplicas}')
-                  NGINX_READY=\$(kubectl get deployment nginx-deployment -n ${NAMESPACE} -o jsonPath='{.status.readyReplicas}')
+                  FRONTEND_READY=\$(kubectl get deployment frontend-deployment -n ${NAMESPACE} -o jsonpath='{.status.readyReplicas}')
+                  BACKEND_READY=\$(kubectl get deployment backend-deployment -n ${NAMESPACE} -o jsonpath='{.status.readyReplicas}')
+                  NGINX_READY=\$(kubectl get deployment nginx-deployment -n ${NAMESPACE} -o jsonpath='{.status.readyReplicas}')
 
                   echo "Frontend Ready Pods = \$FRONTEND_READY"
                   echo "Backend Ready Pods = \$BACKEND_READY"
@@ -105,17 +105,19 @@ pipeline {
     post {
         success {
             echo "Deployment to K8s Completed Successfully"
-            def deploymentInfo = """
-            ==============================================
-                          Deployment Success             
-            ==============================================
-            Namespace : ${NAMESPACE}
-            Frontend Image : ${DOCKER_USERNAME}/coding-cloud-frontend:${params.FRONTEND_IMAGE_TAG}
-            Backend Image : ${DOCKER_USERNAME}/coding-cloud-backend:${params.BACKEND_IMAGE_TAG}
-            Triggered By : ${params.TRIGGERED_BY}
-            ============================================= 
-            """
-            echo deploymentInfo
+            script {
+              def deploymentInfo = """
+              ==============================================
+                            Deployment Success             
+              ==============================================
+              Namespace : ${NAMESPACE}
+              Frontend Image : ${DOCKER_USERNAME}/coding-cloud-frontend:${params.FRONTEND_IMAGE_TAG}
+              Backend Image : ${DOCKER_USERNAME}/coding-cloud-backend:${params.BACKEND_IMAGE_TAG}
+              Triggered By : ${params.TRIGGERED_BY}
+              ============================================= 
+              """
+              echo deploymentInfo
+            }
         }
 
         failure {
@@ -123,7 +125,7 @@ pipeline {
             sh """
               kubectl get events -n ${NAMESPACE} --sort-by='.lastTimestamp' | tail -20
               kubectl logs -n ${NAMESPACE} -l app=frontend --tail=50 || true
-              kubectl logs -n ${NAMESPACE} -l app=backend --tail-50 || true
+              kubectl logs -n ${NAMESPACE} -l app=backend --tail=50 || true
             """
         }
 

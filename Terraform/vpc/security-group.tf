@@ -81,21 +81,19 @@ resource "aws_vpc_security_group_ingress_rule" "sg-master-ingress-6443" {
     depends_on = [ aws_security_group.sg-k8s-master ]
 }
 
-resource "aws_vpc_security_group_ingress_rule" "sg-master-ingress-10250" {
-    security_group_id = aws_security_group.sg-k8s-master.id
-    cidr_ipv4 = "0.0.0.0/0"
-    from_port = 10250
-    to_port = 10250
-    ip_protocol = "tcp"
-    depends_on = [ aws_security_group.sg-k8s-master ]
-}
-
 resource "aws_vpc_security_group_ingress_rule" "sg-master-ingress-179" {
     security_group_id = aws_security_group.sg-k8s-master.id
     cidr_ipv4 = "0.0.0.0/0"
     from_port = 179
     to_port = 179
     ip_protocol = "tcp"
+    depends_on = [ aws_security_group.sg-k8s-master ]
+}
+
+resource "aws_vpc_security_group_ingress_rule" "sg-master-ingress-all-from-worker" {
+    security_group_id = aws_security_group.sg-k8s-master.id
+    referenced_security_group_id = aws_security_group.sg-k8s-worker.id
+    ip_protocol = -1
     depends_on = [ aws_security_group.sg-k8s-master ]
 }
 
@@ -123,6 +121,15 @@ resource "aws_vpc_security_group_ingress_rule" "sg-worker-ingress-ssh" {
     depends_on = [ aws_security_group.sg-k8s-worker ]
 }
 
+resource "aws_vpc_security_group_ingress_rule" "sg-worker-ingress-10250" {
+    security_group_id = aws_security_group.sg-k8s-worker.id
+    cidr_ipv4 = "0.0.0.0/0"
+    from_port = 10250
+    to_port = 10250
+    ip_protocol = "tcp"
+    depends_on = [ aws_security_group.sg-k8s-worker ]
+}
+
 resource "aws_vpc_security_group_ingress_rule" "sg-worker-ingress-179" {
     security_group_id = aws_security_group.sg-k8s-worker.id
     cidr_ipv4 = "0.0.0.0/0"
@@ -139,6 +146,13 @@ resource "aws_vpc_security_group_ingress_rule" "sg-worker-ingress-31000" {
     to_port = 31000
     ip_protocol = "tcp"
     depends_on = [ aws_security_group.sg-k8s-worker ]
+}
+
+resource "aws_vpc_security_group_ingress_rule" "sg-worker-ingress-all-from-master" {
+    security_group_id = aws_security_group.sg-k8s-worker.id
+    referenced_security_group_id = aws_security_group.sg-k8s-master.id
+    ip_protocol = -1
+    depends_on = [ aws_security_group.sg-k8s-worker]
 }
 
 resource "aws_vpc_security_group_egress_rule" "sg-worker-egress-all" {

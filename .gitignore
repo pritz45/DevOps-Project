@@ -2,3 +2,8 @@
 /backend/node_modules/
 /Terraform/.terraform/
 /Terraform/access-keys.csv
+/Terraform/provider.tf
+/Terraform/ec2/ssh-keypairs/
+/Terraform/terraform.tfstate
+/Terraform/terraform.tfstate.backup
+/Terraform/.terraform.lock.hcl

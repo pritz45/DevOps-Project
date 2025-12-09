@@ -19,7 +19,7 @@ pipeline {
             steps {
                 echo "Rollout Initiated"
                 echo "Deployment: ${params.DEPLOYMENT_NAME}"
-                echo "Revision: ${params.Revision}"
+                echo "Revision: ${params.REVISION}"
             }
         }
 
@@ -35,7 +35,7 @@ pipeline {
                           kubectl rollout history deployment backend-deployment -n ${NAMESPACE}
                         """
                     } else {
-                        sh "kubectl rollout history deployment ${DEPLOYMENT_NAME} -n ${NAMESPACE}"
+                        sh "kubectl rollout history deployment ${params.DEPLOYMENT_NAME} -n ${NAMESPACE}"
                     }
                 }
             }
@@ -63,13 +63,13 @@ pipeline {
             steps {
                 echo "Waiting For RollBack to Complete"
                 script {
-                    if (params.DEPLOYMENT_NAME = 'all') {
+                    if (params.DEPLOYMENT_NAME == 'all') {
                         sh """
                           kubectl rollout status deployment frontend-deployment -n ${NAMESPACE} --timeout=5m
                           kubectl rollout status deployment backend-deployment -n ${NAMESPACE} --timeout=5m
                         """
                     } else {
-                        sh "kubectl rollout status deployment ${DEPLOYMENT_NAME} -n ${NAMESPACE} --timeout=5m"
+                        sh "kubectl rollout status deployment ${params.DEPLOYMENT_NAME} -n ${NAMESPACE} --timeout=5m"
                     }
                 }
                 echo "RollBack Completed"
@@ -91,15 +91,17 @@ pipeline {
     post {
         success {
             echo "Rollback Success"
-            def rollbackInfo = """
-            =====================================
-               Rollback Completed Successfully
-            =====================================
-            Deployment : ${params.DEPLOYMENT_NAME}
-            Revision : ${params.REVISION}
-            =====================================
-            """
-            echo rollbackInfo
+            script {
+              def rollbackInfo = """
+              =====================================
+                 Rollback Completed Successfully
+              =====================================
+              Deployment : ${params.DEPLOYMENT_NAME}
+              Revision : ${params.REVISION}
+              =====================================
+              """
+              echo rollbackInfo
+            }
         }
 
         failure {

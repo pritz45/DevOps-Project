@@ -4,7 +4,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_REGISTRY = 'docker.io'
+        DOCKER_REGISTRY = 'index.docker.io/v1/'
         DOCKER_CREDENTIALS_ID = 'dockerhub-credentials'
         DOCKER_IMAGE = "${DOCKER_USERNAME}/coding-cloud-frontend"
         BUILD_NUMBER = "${env.BUILD_NUMBER}"
@@ -12,7 +12,7 @@ pipeline {
 
     parameters {
         string(name: 'DOCKER_USERNAME', defaultValue: 'pritam44')
-        string(name: 'GIT_BRANCH', defaultValue: 'main')
+        string(name: 'GIT_BRANCH', defaultValue: 'master')
     }
 
     stages {
@@ -31,8 +31,8 @@ pipeline {
                 dir('frontend') {
                     echo "Building Frontend Images"
                     sh """
-                       docker build -t ${DOCKER_IMAGE}:latest
-                       docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                       docker build -t ${DOCKER_IMAGE}:latest .
+                       docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .
                     """
                     echo "Frontend Images Built Successfully"
                 }
@@ -55,18 +55,20 @@ pipeline {
 
         stage('Push to Dockerhub') {
             steps {
-               echo "Pushing Frontend Image to Dockerhub"
-               docker.withRegistry("https://${DOCKER_RESGISTRY}", "${DOCKER_CREDENTIALS_ID}") {
-                  sh """
-                    docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
-                    docker push ${DOCKER_IMAGE}:latest
-                  """
+                  script{
+                    echo "Pushing Frontend Image to Dockerhub"
+                    docker.withRegistry("https://${DOCKER_REGISTRY}", "${DOCKER_CREDENTIALS_ID}") {
+                    sh """
+                      docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                      docker push ${DOCKER_IMAGE}:latest
+                    """
+                   echo "Frontend Image Pushed Successfully"
+                   }
                 }
-                echo "Frontend Image Pushed Successfully"
             }
         }
 
-        stage('Triger Deploy Job') {
+        stage('Trigger Deploy Job') {
             steps {
                 echo "Frontend Build Complete --- Triggering Deploy Job"
                 script {
@@ -74,9 +76,9 @@ pipeline {
                     env.FRONTEND_IMAGE_TAG = "${BUILD_NUMBER}"
 
                     // Trigger Deploy Job
-                    build job: 'Deploy-to-K8s'
+                    build job: 'Deploy-to-K8s',
                        wait: false,
-                       parameters [
+                       parameters: [
                         string(name: 'FRONTEND_IMAGE_TAG', value: "${BUILD_NUMBER}"),
                         string(name: 'TRIGGERED_BY', value: 'Build-Frontend')
                        ]
@@ -96,7 +98,7 @@ pipeline {
 
         always {
             echo "Cleaning Up Images"
-            sh 'docker image prune -f'
+            sh 'docker image prune -a -f'
             cleanWs()
             echo "Cleaning Up Completed"
         }
