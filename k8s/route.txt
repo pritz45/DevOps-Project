@@ -1,0 +1,7 @@
+nginx deployment : 80 / 31000
+frontend deployment : 90
+backend deployment : 5000
+
+lb --> ip:31000 --> nginx-svc:80 --> nginx-container:80
+"/" --> frontend-svc:90 --> frontend-container:80
+"/backend" --> backend-svc:5000 --> backend-container:5000

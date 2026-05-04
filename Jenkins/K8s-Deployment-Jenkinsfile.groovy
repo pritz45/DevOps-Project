@@ -35,7 +35,7 @@ pipeline {
                   kubectl get deployment frontend-deployment -n ${NAMESPACE} -o yaml > backup/frontend-deployment-backup.yml || true
                   kubectl get deployment backend-deployment -n ${NAMESPACE} -o yaml > backup/backend-deployment-backup.yml || true
                 """
-                echo "Backup Create Successfully"
+                echo "Backup Created Successfully"
             }
         }
 

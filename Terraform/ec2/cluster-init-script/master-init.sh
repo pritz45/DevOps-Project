@@ -52,7 +52,7 @@ echo "$JOIN_COMMAND" > /tmp/cluster-join-command.sh
 chmod +x /tmp/cluster-join-command.sh
 
 log "Uploading Join-command.sh to S3"
-aws s3 cp /tmp/cluster-join-command.sh s3://coding-cloud-cluster
+aws s3 cp /tmp/cluster-join-command.sh s3://coding-cloud-bucket-123
 check_status "S3 File Upload"
 log "Join command.sh uploaded successfully"
 

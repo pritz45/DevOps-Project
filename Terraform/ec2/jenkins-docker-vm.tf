@@ -1,5 +1,5 @@
 resource "aws_instance" "jenkins" {
-    ami = "ami-02b8269d5e85954ef"
+    ami = "ami-07a00cf47dbbc844c"
     instance_type = "t2.medium"
     key_name = aws_key_pair.key.key_name
     subnet_id = var.public_sub_1
@@ -15,7 +15,7 @@ resource "aws_instance" "jenkins" {
 }
 
 resource "aws_instance" "docker" {
-    ami = "ami-02b8269d5e85954ef"
+    ami = "ami-07a00cf47dbbc844c"
     instance_type = "t2.medium"
     key_name = aws_key_pair.key.key_name
     subnet_id = var.private_sub_1

@@ -1,5 +1,5 @@
 resource "aws_instance" "master" {
-    ami = "ami-00cafcbeaa5aaba5a"
+    ami = "ami-0d8b31a89ddaf2cd7"
     instance_type = "t2.medium"
     key_name = aws_key_pair.key.key_name
     subnet_id = var.private_sub_1
@@ -14,7 +14,7 @@ resource "aws_instance" "master" {
 }
 
 resource "aws_instance" "worker" {
-    ami = "ami-00cafcbeaa5aaba5a"
+    ami = "ami-0d8b31a89ddaf2cd7"
     instance_type = "t2.medium"
     key_name = aws_key_pair.key.key_name
     subnet_id = var.private_sub_2
